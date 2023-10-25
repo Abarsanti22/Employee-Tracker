@@ -79,5 +79,28 @@ function viewRoles () {
     })
 }
 
-
+function viewEmployees () {
+    connection.query(
+        "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id,employee.manager_id, role.title, role.salary, role.id, department.id FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id",
+         function (err, result) {
+            console.table(result);
+            selection();
+        })
 }
+
+function addDept () {
+  inquirer.prompt ([
+    {
+      type: "input",
+      name: "department",
+      message: "Enter the name of the department"
+    }
+  ])
+  .then(function(answer) {
+    connection.query("INSERT INTO department (name) VALUES (?)", data.department, (err, results) => {
+        if (err) throw err;
+        selection();
+    })
+})
+}
+
