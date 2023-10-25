@@ -7,9 +7,9 @@ const db = mysql.createConnection (
     host: "localhost",
     user: "root",
     password: "Hallball",
-    database: "employees_db"
+    database: "staff_db"
 },
-console.log("Connected to the employees_db database.")
+console.log("Connected to the staff_db database.")
 );
 
 const selection = function () {
@@ -31,31 +31,31 @@ const selection = function () {
      .then(function(answers) {
         switch (answers.prompt) {
 
-            case "View all departments";
+            case "View all departments":
             viewAllDepts();
             break;
 
-            case "View all roles";
+            case "View all roles":
             viewRoles();
             break;
 
-            case "View all employees";
+            case "View all employees":
             viewEmployees();
             break;
 
-            case "Add a department";
+            case "Add a department":
             addDept();
             break;
 
-            case "Add a role";
+            case "Add a role":
             addRole();
             break;
 
-            case "Add an employee";
+            case "Add an employee":
             addEmployee();
             break;
 
-            case "Update an employee role";
+            case "Update an employee role":
             updateEmployee();
             break;
         }
@@ -64,7 +64,7 @@ const selection = function () {
 selection();
 
 function viewAllDepts () {
-    connection.query(`SELECT * FROM department`, function (err, result) {
+    connection.query("SELECT * FROM department", function (err, result) {
         if (err) throw err;
         console.table(result);
         selection();
@@ -72,7 +72,7 @@ function viewAllDepts () {
 }
 
 function viewRoles () {
-    connection.query(`SELECT * FROM role`, function (err, result) {
+    connection.query("SELECT * FROM role", function (err, result) {
         if (err) throw err;
         console.table(result);
         selection();
@@ -105,5 +105,38 @@ function addDept () {
 }
 
 function addRole () {
+    connection.query("SELECT * FROM department", function (err, result) {
+        if (err) throw err;
+ inquirer.prompt ([
+        {
+            type: 'input',
+            message: "What is the name of the role?",
+            name: 'name',
+        },
+        {
+            type: 'input',
+            message: "What is the salary of the role?",
+            name: 'salary',
+        },
+        {
+            type: 'list',
+            message: "What department does the role belong to?",
+            name: 'department',
+            choices: deptChoice
+        }
+    ])   
+    .then(function(answer) {
+        connection.query(`SELECT id FROM department WHERE department.name = ?`, answer.department, (err, results) => {
+            let department_id = results[0].id;
+        connection.query(`INSERT INTO role(title, salary, department_id)
+        VALUES (?,?,?)`, [answer.title, answer.salary, department_id], (err, results) => {
+            viewRoles();
+        })
+        });
+    })
+})
+}
 
+function addEmployee () {
+    
 }
