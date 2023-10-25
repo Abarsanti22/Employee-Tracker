@@ -97,10 +97,13 @@ function addDept () {
     }
   ])
   .then(function(answer) {
-    connection.query("INSERT INTO department (name) VALUES (?)", data.department, (err, results) => {
+    connection.query("INSERT INTO department (name) VALUES (?)", answer.department, (err, results) => {
         if (err) throw err;
         selection();
     })
 })
 }
 
+function addRole () {
+
+}
