@@ -105,8 +105,9 @@ function addDept () {
 }
 
 function addRole () {
+    let deptChoice = [];
     connection.query("SELECT * FROM department", function (err, result) {
-        if (err) throw err;
+    if (err) throw err;
  inquirer.prompt ([
         {
             type: 'input',
@@ -138,5 +139,121 @@ function addRole () {
 }
 
 function addEmployee () {
-    
+    let roles= [];
+    let employees= [];
+    connection.query(`SELECT * FROM role`, function (err, results) {
+        for (let i = 0; i < results.length; i++) {
+            roles.push(results[i].title);
+        }
+        connection.query(`SELECT * FROM employee`, function (err, results) {
+            for (let i = 0; i < results.length; i++) {
+                let employeeName = `${results[i].first_name} ${results[i].last_name}`
+                employees.push(employeeName);
+            }
+        inquirer.prompt([
+                {
+                    type: 'input',
+                    message: "What is the employee's first name?",
+                    name: 'first_name',
+                },
+                {
+                    type: 'input',
+                    message: "What is the employee's last name?",
+                    name: 'last_name',
+                },
+                {
+                    type: 'list',
+                    message: "What is the employee's role?",
+                    name: 'role',
+                    choices: roles
+                },
+                {
+                    type: 'list',
+                    message: "Does the employee have a manager?",
+                    name: 'manager',
+                    choices: ["Yes", "No"]
+                } ])
+        .then(function(answer) {
+            let roleName = answer.role;
+            let first_name = answer.first_name;
+            let last_name = answer.last_name;
+            let role_id = '';
+            let manager = '';
+            connection.query(`SELECT id FROM role WHERE role.title = ?`, answer.role, (err, results) => {
+                role_id = results[0].id;
+            });
+            if (answer.manager === "Yes") {
+             inquirer.prompt([
+                    {
+                    type: 'list',
+                    message: "Please select the employees manager",
+                    name: 'manager',
+                    choices: employees
+                    }   
+                    .then(function(answer) {
+                    connection.query(`SELECT id FROM role WHERE role.title = ?`, roleName, (err, results) => {
+                        role_id = results[0].id;
+                    })
+                    connection.query(`SELECT id FROM employee WHERE employee.first_name = ? AND employee.last_name = ?;`, answer.manager.split(" "), (err, results) => {
+                        manager = results[0].id;
+                        connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+                        VALUES (?,?,?,?)`, [first_name, last_name, role_id, manager], (err, results) => {
+                            viewEmployees();
+                        })
+                    })
+                }) ])
+            } else {
+                manager = null;
+                connection.query(`SELECT id FROM role WHERE role.title = ?`, roleName, (err, results) => {
+                    role_id = results[0].id;
+                    connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+                    VALUES (?,?,?,?)`, [data.first_name, data.last_name, role_id, manager], (err, results) => {
+                        console.log("\nNew employee added. See below:");
+                        viewAllEmployees();
+                    })
+                })
+            }
+        })
+    })
+})
+}
+function updateEmployee () {
+    let roles= [];
+    let employees= [];
+    connection.query(`SELECT * FROM role`, function (err, results) {
+        for (let i = 0; i < results.length; i++) {
+            roles.push(results[i].title);
+        }
+    connection.query(`SELECT * FROM employee`, function (err, results) {
+        for (let i = 0; i < results.length; i++) {
+            let employees = `${results[i].first_name} ${results[i].last_name}`
+            employees.push(employeeName);
+        }
+        inquirer.prompt([
+            {
+                type: 'list',
+                message: "Which employee do you want to update?",
+                name: 'employee',
+                choices: employees
+            },
+            {
+                type: 'list',
+                message: "What is the employee's new role?",
+                name: 'role',
+                choices: roles
+            },
+        ]).then((answer) => {
+
+            connection.query(`SELECT id FROM role WHERE role.title = ?;`, answer.role, (err, results) => {
+                role_id = results[0].id;
+                connection.query(`SELECT id FROM employee WHERE employee.first_name = ? AND employee.last_name = ?;`, data.employee.split(" "), (err, results) => {
+                    connection.query(`UPDATE employee SET role_id = ? WHERE id = ?;`, [role_id, results[0].id], (err, results) => {
+                        viewAllEmployees();
+                    })
+                })
+
+            })
+        })
+    })
+})
 }
