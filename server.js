@@ -7,9 +7,9 @@ const db = mysql.createConnection (
     host: "localhost",
     user: "root",
     password: "Hallball",
-    database: "staff_db"
+    database: "employee_tracker"
 },
-console.log("Connected to the staff_db database.")
+console.log("Connected to the employee_tracker database.")
 );
 
 const selection = function () {
