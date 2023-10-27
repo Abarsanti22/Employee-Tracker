@@ -189,7 +189,7 @@ function addEmployee () {
                     message: "Please select the employees manager",
                     name: 'manager',
                     choices: employees
-                    }   
+                    } ])  
                     .then(function(answer) {
                     connection.query(`SELECT id FROM role WHERE role.title = ?`, roleName, (err, results) => {
                         role_id = results[0].id;
@@ -201,15 +201,15 @@ function addEmployee () {
                             viewEmployees();
                         })
                     })
-                }) ])
+                }) 
             } else {
                 manager = null;
                 connection.query(`SELECT id FROM role WHERE role.title = ?`, roleName, (err, results) => {
                     role_id = results[0].id;
                     connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
-                    VALUES (?,?,?,?)`, [data.first_name, data.last_name, role_id, manager], (err, results) => {
+                    VALUES (?,?,?,?)`, [answer.first_name, answer.last_name, role_id, manager], (err, results) => {
                         console.log("\nNew employee added. See below:");
-                        viewAllEmployees();
+                        viewEmployees();
                     })
                 })
             }
@@ -226,7 +226,7 @@ function updateEmployee () {
         }
     connection.query(`SELECT * FROM employee`, function (err, results) {
         for (let i = 0; i < results.length; i++) {
-            let employees = `${results[i].first_name} ${results[i].last_name}`
+            let employeeName = `${results[i].first_name} ${results[i].last_name}`
             employees.push(employeeName);
         }
         inquirer.prompt([
@@ -246,9 +246,9 @@ function updateEmployee () {
 
             connection.query(`SELECT id FROM role WHERE role.title = ?;`, answer.role, (err, results) => {
                 role_id = results[0].id;
-                connection.query(`SELECT id FROM employee WHERE employee.first_name = ? AND employee.last_name = ?;`, data.employee.split(" "), (err, results) => {
+                connection.query(`SELECT id FROM employee WHERE employee.first_name = ? AND employee.last_name = ?;`, answer.employee.split(" "), (err, results) => {
                     connection.query(`UPDATE employee SET role_id = ? WHERE id = ?;`, [role_id, results[0].id], (err, results) => {
-                        viewAllEmployees();
+                        viewEmployees();
                     })
                 })
 
