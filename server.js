@@ -1,6 +1,5 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-// const cTable = require("console.table");
 
 const connection = mysql.createConnection (
 {
@@ -180,8 +179,9 @@ function addEmployee () {
             let roleName = answer.role;
             let first_name = answer.first_name;
             let last_name = answer.last_name;
-            let role_id = '';
             let manager = '';
+            let role_id = '';
+
             connection.query(`SELECT id FROM role WHERE role.title = ?`, answer.role, (err, results) => {
                 role_id = results[0].id;
             });
@@ -189,7 +189,7 @@ function addEmployee () {
              inquirer.prompt([
                     {
                     type: 'list',
-                    message: "Please select the employees manager",
+                    message: "Who is the employee's manager?",
                     name: 'manager',
                     choices: employees
                     } ])  
@@ -211,7 +211,6 @@ function addEmployee () {
                     role_id = results[0].id;
                     connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
                     VALUES (?,?,?,?)`, [answer.first_name, answer.last_name, role_id, manager], (err, results) => {
-                        console.log("\nNew employee added. See below:");
                         viewEmployees();
                     })
                 })
@@ -235,7 +234,7 @@ function updateEmployee () {
         inquirer.prompt([
             {
                 type: 'list',
-                message: "Which employee do you want to update?",
+                message: "Which employee would you like to update?",
                 name: 'employee',
                 choices: employees
             },
