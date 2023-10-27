@@ -1,15 +1,15 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-const cTable = require("console.table");
+// const cTable = require("console.table");
 
-const db = mysql.createConnection (
+const connection = mysql.createConnection (
 {
     host: "localhost",
     user: "root",
     password: "Hallball",
-    database: "employee_tracker"
+    database: "staffdb"
 },
-console.log("Connected to the employee_tracker database.")
+console.log("Connected to the staffdb database.")
 );
 
 const selection = function () {
