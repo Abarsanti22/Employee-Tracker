@@ -106,8 +106,11 @@ function addDept () {
 
 function addRole () {
     let deptChoice = [];
-    connection.query("SELECT * FROM department", function (err, result) {
-    if (err) throw err;
+    connection.query("SELECT * FROM department", function (err, results) {
+        for (let i = 0; i < results.length; i++) {
+            deptChoice.push(results[i].name);
+        if (err) throw err;
+        }
  inquirer.prompt ([
         {
             type: 'input',
